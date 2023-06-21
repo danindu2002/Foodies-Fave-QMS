@@ -6,6 +6,9 @@ public class Main
     public static int burgerStock = 50;
     public static int newBurgersCount;
     public static String answer;
+    public static int queueNumber;
+    public static int actualQueueNumber;
+    public static int lastElement;
     public static Scanner input = new Scanner(System.in);
 
     // declaring a 2-dimensional array for storing queue data
@@ -50,7 +53,7 @@ public class Main
             case "VFQ":
                 // Printing the cashier view with ALL queues
                 cashierHeader();
-                cashierQueue();
+                cashierFullQueue();
                 loopController();
                 break;
 
@@ -58,31 +61,7 @@ public class Main
             case "VEQ":
                 // Printing the cashier view with EMPTY queues
                 cashierHeader();
-                int totalQueues = cashiers[0].length + cashiers[1].length + cashiers[2].length;
-                int emptyQueues = 0;
-                for(int i = 0; i < cashiers[2].length; i++)
-                {
-                    for(int j = 0; j < cashiers.length; j++)
-                    {
-                        if(i >= cashiers[j].length)
-                        {
-                            System.out.print("      ");
-                            continue;
-                        }
-                        if(cashiers[j][i] == null)
-                        {
-                            System.out.print("  X   ");
-                            emptyQueues++;
-                        }
-                        else
-                        {
-                            System.out.print("      ");
-                        }
-                    }
-                    System.out.println("");
-                }
-                System.out.println(emptyQueues + " queues are Empty out of " + totalQueues);
-
+                cashierEmptyQueue();
                 loopController();
                 break;
 
@@ -94,16 +73,23 @@ public class Main
 
             case "103":
             case "RCQ":
-                //todo
+                // validating user inputs and removing a customer without serving
+                removeCustomer();
                 break;
 
             case "104":
             case "PCQ":
-                //todo
+                // getting and validating queue location and then removing a served customer
+                removeServedCustomer();
                 break;
 
             case "105":
             case "VCS":
+                //todo
+                break;
+
+            case "106":
+            case "SPD":
                 //todo
                 break;
 
@@ -116,13 +102,7 @@ public class Main
             case "STK":
                 // displaying remaining burger stock and low stocks alert
                 System.out.println("Remaining Burger Stock: "+ burgerStock);
-                if(burgerStock <= 10)
-                {
-                    System.out.println("""
-                            
-                            *** Alert ***
-                            You are running out of stocks, please refill !""");
-                }
+                stockAlert();
                 loopController();
                 break;
 
@@ -185,7 +165,7 @@ public class Main
         System.out.println("");
         }
     }
-    static void cashierQueue()
+    static void cashierFullQueue()
     {
         // Printing the cashier queue
         for(int i = 0; i < cashiers[2].length; i++)
@@ -213,10 +193,39 @@ public class Main
                 O – Occupied""");
     }
 
+    static void cashierEmptyQueue()
+    {
+        int totalQueues = cashiers[0].length + cashiers[1].length + cashiers[2].length;
+        int emptyQueues = 0;
+        for(int i = 0; i < cashiers[2].length; i++)
+        {
+            for(int j = 0; j < cashiers.length; j++)
+            {
+                if(i >= cashiers[j].length)
+                {
+                    System.out.print("      ");
+                    continue;
+                }
+                if(cashiers[j][i] == null)
+                {
+                    System.out.print("  X   ");
+                    emptyQueues++;
+                }
+                else
+                {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println("");
+        }
+        System.out.println(emptyQueues + " queues are Empty out of " + totalQueues);
+    }
+
     static void addCustomersToQueue()
     {
-        boolean loopAgain = true;
-        while(loopAgain)
+        boolean nameLoop = true;
+        boolean queueLoop = true;
+        while(nameLoop)
         {
             // checking if the customer can be served with the remaining stock or not
             if (burgerStock >= 5)
@@ -225,51 +234,62 @@ public class Main
                 String name = input.next();
 
                 // validating if the customer name is only alphabetical or not
-                if (name.matches("^[a-zA-Z]*$") )
+                if (name.matches("^[a-zA-Z]*$"))
                 {
-                    // validating user input only as an integer
-                    try
+                    nameLoop = false;
+                    while(queueLoop)
                     {
-                        System.out.print("Enter Queue: ");
-                        int queueNumber = input.nextInt();
-
-                        // checking the queue number is one of a cashier
-                        if(queueNumber >= 1 && queueNumber <=3)
+                        // validating user input only as an integer
+                        try
                         {
-                            int actualQueueNumber = queueNumber - 1;
-                            int occupiedQueuePositions = 0;
+                            getQueue();
 
-                            for (int k = 0; k < cashiers[actualQueueNumber].length; k++)
+                            // checking the queue number is one of a cashier
+                            if(queueNumber >= 1 && queueNumber <=3)
                             {
-                                // adding customer name to a empty queue position only if it is empty
-                                if (cashiers[actualQueueNumber][k] == null)
-                                {
-                                    cashiers[actualQueueNumber][k] = name;
-                                    System.out.println(name + " added to the queue " + queueNumber + " successfully");
-                                    loopAgain = false;
-                                    loopController();
-                                    break;
-                                }
-                                else
-                                {
-                                    occupiedQueuePositions++;
+                                actualQueueNumber = queueNumber - 1;
+                                int occupiedQueuePositions = 0;
 
-                                    // giving a message if the particular queue is full
-                                    if (occupiedQueuePositions == cashiers[actualQueueNumber].length)
+                                for (int k = 0; k < cashiers[actualQueueNumber].length; k++)
+                                {
+                                    // adding customer name to an empty queue position only if it is empty
+                                    if (cashiers[actualQueueNumber][k] == null)
                                     {
-                                        System.out.println("Queue is full, Please try again");
+                                        cashiers[actualQueueNumber][k] = name;
+                                        System.out.println(name + " added to the queue " + queueNumber + " successfully");
+
+                                        // reserving 5 burgers for the customer
+                                        burgerStock -= 5;
+
+                                        // showing the low stocks alert if the burger count is less than 10
+                                        stockAlert();
+
+                                        queueLoop = false;
+                                        loopController();
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        occupiedQueuePositions++;
+
+                                        // giving a message if the particular queue is full
+                                        if (occupiedQueuePositions == cashiers[actualQueueNumber].length)
+                                        {
+                                            System.out.println("Queue is full, Please try again");
+                                        }
                                     }
                                 }
                             }
+                            else
+                            {
+                                System.out.println("Invalid Queue number");
+                            }
                         }
-                        else
+                        catch (InputMismatchException e)
                         {
-                            System.out.println("Invalid Queue number");
+                            System.out.println("Integer required");
+                            input.next();
                         }
-                    }
-                    catch (InputMismatchException e)
-                    {
-                        System.out.println("Integer required");
                     }
                 }
                 else
@@ -286,8 +306,8 @@ public class Main
 
     static void addBurgersToStock()
     {
-        boolean typeError = true;
-        while (typeError)
+        boolean loop2 = true;
+        while (loop2)
         {
             // validating and getting only integer inputs
             try
@@ -304,7 +324,7 @@ public class Main
                     if(burgerStock <= 50)
                     {
                         System.out.println("Stocks updated successfully. Total Burger Stock: " + burgerStock);
-                        typeError = false;
+                        loop2 = false;
                         loopController();
                     }
                     else
@@ -328,4 +348,140 @@ public class Main
         }
     }
 
+    static void removeServedCustomer()
+    {
+        boolean loop = true;
+        while(loop)
+        {
+            try
+            {
+                getQueue();
+
+                // checking the queue number is one of a cashier
+                if(queueNumber >= 1 && queueNumber <=3)
+                {
+                    actualQueueNumber = queueNumber - 1;
+                    int lastElement = cashiers[actualQueueNumber].length - 1;
+
+                    // removing first one and updating others
+                    if(cashiers[actualQueueNumber][0] != null)
+                    {
+                        for(int k = 0; k < lastElement; k++)
+                        {
+                            cashiers[actualQueueNumber][k] = cashiers[actualQueueNumber][k + 1];
+                        }
+                        cashiers[actualQueueNumber][lastElement] = null;   /* updating the last one in the queue as empty*/
+                        System.out.println("Served customer was removed successfully from queue " + queueNumber);
+                        loop = false;
+                        loopController();
+                    }
+                    else
+                    {
+                        System.out.println("The selected queue is empty");
+                    }
+                }
+                else
+                {
+                    System.out.println("Invalid Queue number");
+                }
+            }
+            catch (InputMismatchException e)
+            {
+                System.out.println("Integer required");
+                input.next();
+            }
+        }
+    }
+
+    static void removeCustomer()
+    {
+        boolean loop3 = true;
+        boolean loop4 = true;
+        while(loop3)
+        {
+            // checking if the queue number is an integer
+            try
+            {
+                getQueue();
+                actualQueueNumber = queueNumber - 1;
+
+                // checking the queue number is one of a cashier
+                if(queueNumber >= 1 && queueNumber <=3)
+                {
+                    loop3 = false;
+                    while(loop4)
+                    {
+                        // checking if the position is an integer
+                        try
+                        {
+                            System.out.print("Enter Position in the queue: ");
+                            int position = input.nextInt();
+
+                            // checking the validity of the position
+                            if(position >= 1 && position <= cashiers[actualQueueNumber].length)
+                            {
+                                int actualPosition = position - 1;
+                                lastElement = cashiers[actualQueueNumber].length - 1;
+
+                                // updating other positions
+                                if(cashiers[actualQueueNumber][actualPosition] != null)
+                                {
+                                    for(int k = actualPosition; k < lastElement; k++)
+                                    {
+                                        cashiers[actualQueueNumber][k] = cashiers[actualQueueNumber][k + 1];
+                                    }
+                                    cashiers[actualQueueNumber][lastElement] = null;   /* updating the last one in the queue as empty */
+
+                                    System.out.println("Customer was removed successfully from queue " + queueNumber);
+
+                                    // increasing the burger count as the customer had not been served
+                                    burgerStock += 5;
+                                    loop4 = false;
+                                }
+                                else
+                                {
+                                    System.out.println("The selected position is already empty");
+                                }
+                                loopController();
+                            }
+                            else
+                            {
+                                System.out.println("Invalid position");
+                            }
+                        }
+                        catch (InputMismatchException e)
+                        {
+                            System.out.println("Integer required");
+                            input.next();
+                        }
+                    }
+                }
+                else
+                {
+                    System.out.println("Invalid Queue number");
+                }
+            }
+            catch (InputMismatchException e)
+            {
+                System.out.println("Integer required");
+                input.next();
+            }
+        }
+    }
+
+    static void stockAlert()
+    {
+        if(burgerStock <= 10)
+        {
+            System.out.println("""
+                            
+                            *** Alert ***
+                            You have less than 10 burgers left, please refill !""");
+        }
+    }
+    static void getQueue()
+    {
+        System.out.print("Enter Queue: ");
+        queueNumber = input.nextInt();
+    }
 }
