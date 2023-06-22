@@ -11,10 +11,19 @@ public class Main
     public static int lastElement;
     public static Scanner input = new Scanner(System.in);
 
-    // declaring a 2-dimensional array for storing queue data
+    // declaring a 2D array for storing queue data
     public static String[][] cashiers = new String[][]
     {
         new String[2], new String[3], new String[5]
+    };
+
+    // declaring an array to sort names
+    public static String[] names = new String[10];
+
+    // declaring a 2D array to store ASCII values of the names up to 2 characters
+    public static int[][] asciiValues = new int[][]
+    {
+        new int[10], new int[10]
     };
 
     public static void main(String[] args)
@@ -85,7 +94,8 @@ public class Main
 
             case "105":
             case "VCS":
-                //todo
+                // sorting names in alphabetical order by using bubble sort
+                sortNames();
                 break;
 
             case "106":
@@ -467,6 +477,69 @@ public class Main
                 input.next();
             }
         }
+    }
+
+    static void sortNames()
+    {
+        // adding customer names to names array
+        int l = 0;
+        for(int i = 0; i < cashiers[2].length; i++)
+        {
+            for(int j = 0; j < cashiers.length; j++)
+            {
+                // adding ascii values of first 2 characters to asciiValues array
+                if(i >= cashiers[j].length) continue;
+                if(cashiers[j][i] != null)
+                {
+                    names[l] = cashiers[j][i].toLowerCase();
+                    asciiValues[0][l] = (int) names[l].charAt(0);
+                    if(names[l].length() > 1)
+                    {
+                        asciiValues[1][l] = (int) names[l].charAt(1);
+                    }
+                    l++;
+                }
+            }
+        }
+
+        // bubble sorting first two characters of each name in ascending order
+        for(int m = 0; m < l; m++)
+        {
+            if(names[m] == null || asciiValues[0][m] == 0) continue;
+            int n = m + 1;
+            for(n = 0; n < l; n++)
+            {
+                if(asciiValues[0][m] < asciiValues[0][n] || (asciiValues[0][m] == asciiValues[0][n] && asciiValues[1][m] < asciiValues[1][n]))
+                {
+                    // Swapping names
+                    String temp = names[n];
+                    names[n] = names[m];
+                    names[m] = temp;
+
+                    // Swapping first character values
+                    int temp1 = asciiValues[0][n];
+                    asciiValues[0][n] = asciiValues[0][m];
+                    asciiValues[0][m] = temp1;
+
+                    // Swapping second character values
+                    int temp2 = asciiValues[1][n];
+                    asciiValues[1][n] = asciiValues[1][m];
+                    asciiValues[1][m] = temp2;
+                }
+            }
+        }
+
+        // printing sorted names
+        int rank = 1;
+        for(String name: names)
+        {
+            if(name != null)
+            {
+                System.out.println(rank +". " + name);
+                rank++;
+            }
+        }
+        loopController();
     }
 
     static void stockAlert()
