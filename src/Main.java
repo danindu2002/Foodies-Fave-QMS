@@ -65,7 +65,6 @@ public class Main
         String option = input.next();
 
         // selecting each option and building their functionalities
-
         switch (option.toUpperCase()) {
             case "100", "VFQ" -> {
                 // Printing the cashier view with ALL queues
@@ -167,7 +166,7 @@ public class Main
     }
     static void cashierFullQueue()
     {
-        // Printing the cashier queue
+        // Printing the full cashier queue
         for(int i = 0; i < cashiers[2].length; i++)
         {
             for(int j = 0; j < cashiers.length; j++)
@@ -195,6 +194,7 @@ public class Main
 
     static void cashierEmptyQueue()
     {
+        // printing the empty cashier queue
         int totalQueues = cashiers[0].length + cashiers[1].length + cashiers[2].length;
         for(int i = 0; i < cashiers[2].length; i++)
         {
@@ -491,10 +491,10 @@ public class Main
                 if(cashiers[j][i] != null)
                 {
                     names[l] = cashiers[j][i].toLowerCase();
-                    asciiValues[0][l] = (int) names[l].charAt(0);
+                    asciiValues[0][l] = names[l].charAt(0);
                     if(names[l].length() > 1)
                     {
-                        asciiValues[1][l] = (int) names[l].charAt(1);
+                        asciiValues[1][l] = names[l].charAt(1);
                     }
                     l++;
                 }
@@ -505,8 +505,7 @@ public class Main
         for(int m = 0; m < l; m++)
         {
             if(names[m] == null || asciiValues[0][m] == 0) continue;
-            int n = m + 1;
-            for(n = 0; n < l; n++)
+            for(int n = 0; n < l; n++)
             {
                 if(asciiValues[0][m] < asciiValues[0][n] || (asciiValues[0][m] == asciiValues[0][n] && asciiValues[1][m] < asciiValues[1][n]))
                 {
@@ -631,6 +630,7 @@ public class Main
 
             // printing saved data into the console
             String fileOutput = String.format("""
+                                    -------------------- Loaded Data -------------------- \n
                                     Last Saved             : %s \n
                                     Sold Burger Count      : %s
                                     Reserved Burger Count  : %s
@@ -649,16 +649,18 @@ public class Main
     }
     static void stockAlert()
     {
+        // printing a low stocks alert
         if(burgerStock <= 10)
         {
             System.out.println("""
                             
-                            *** Alert ***
+                                              *** Alert ***
                             You have less than 10 burgers left, please refill !""");
         }
     }
     static void getQueue()
     {
+        // getting queue number
         System.out.print("Enter Queue: ");
         queueNumber = input.nextInt();
     }
