@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Main
 {
     public static int burgerStock = 50;
-    public static int emptyQueues = 10;
+    public static int emptySlots = 10;
     public static int newBurgersCount;
     public static int soldBurgers = 0;
     public static int servedCustomerCount = 0;
@@ -195,7 +195,7 @@ public class Main
     static void cashierEmptyQueue()
     {
         // printing the empty cashier queue
-        int totalQueues = cashiers[0].length + cashiers[1].length + cashiers[2].length;
+        int totalSlots = cashiers[0].length + cashiers[1].length + cashiers[2].length;
         for(int i = 0; i < cashiers[2].length; i++)
         {
             for(int j = 0; j < cashiers.length; j++)
@@ -216,7 +216,20 @@ public class Main
             }
             System.out.println("");
         }
-        System.out.println(emptyQueues + " queues are Empty out of " + totalQueues);
+        // printing cashiers with empty slots
+        for(int i = 0; i < cashiers.length; i++)
+        {
+            for(int j = 0; j < cashiers[2].length; j++)
+            {
+                if(j >= cashiers[i].length) continue;
+                if(cashiers[i][j] == null)
+                {
+                    System.out.println("Cashier " + (i+1) + " has empty slots");
+                    break;
+                }
+            }
+        }
+        System.out.println(emptySlots + " slots are Empty out of " + totalSlots);
     }
 
     static void addCustomersToQueue()
@@ -259,7 +272,7 @@ public class Main
                                         // reserving 5 burgers for the customer and updating empty queues
                                         burgerStock -= 5;
                                         reservedBurgers +=5;
-                                        emptyQueues--;
+                                        emptySlots--;
 
                                         // showing the low stocks alert if the burger count is less than 10
                                         stockAlert();
@@ -376,7 +389,7 @@ public class Main
                         // updating sold burger count and served customer count
                         soldBurgers += 5;
                         servedCustomerCount +=1;
-                        emptyQueues++;
+                        emptySlots++;
                         reservedBurgers -= 5;
 
                         loop = false;
@@ -444,7 +457,7 @@ public class Main
                                     // increasing the burger count as the customer had not been served
                                     burgerStock += 5;
                                     reservedBurgers -= 5;
-                                    emptyQueues++;
+                                    emptySlots++;
                                     loop4 = false;
                                 }
                                 else
@@ -569,11 +582,11 @@ public class Main
 
             // writing second half
             String secondHalf = String.format("""
-                            No. of Empty Queues    : %s \n
+                            No. of Empty slots    : %s \n
                             --------------------------------------------------------------------------------------------------------------------------- \n
                             Served Customers Count : %s \n \n \n
                                                                                    * * * * * *
-                            """, emptyQueues, servedCustomerCount);
+                            """, emptySlots, servedCustomerCount);
             fileInput.write(secondHalf);
 
             // closing file connection
@@ -610,8 +623,8 @@ public class Main
                     reservedBurgers = Integer.parseInt(line.split(":")[1].trim());
                 } else if (line.startsWith("Remaining Burger Count")) {
                     burgerStock = Integer.parseInt(line.split(":")[1].trim());
-                } else if (line.startsWith("No. of Empty Queues")) {
-                    emptyQueues = Integer.parseInt(line.split(":")[1].trim());
+                } else if (line.startsWith("No. of Empty slots")) {
+                    emptySlots = Integer.parseInt(line.split(":")[1].trim());
                 } else if (line.startsWith("Served Customers Count")) {
                     servedCustomerCount = Integer.parseInt(line.split(":")[1].trim());
                 }
@@ -640,7 +653,7 @@ public class Main
                                     Cashier 1              : %s
                                     Cashier 2              : %s
                                     Cashier 3              : %s
-                                    """, saveTime, soldBurgers, reservedBurgers, burgerStock, emptyQueues, servedCustomerCount,
+                                    """, saveTime, soldBurgers, reservedBurgers, burgerStock, emptySlots, servedCustomerCount,
                     Arrays.toString(cashiers[0]), Arrays.toString(cashiers[1]), Arrays.toString(cashiers[2]));
             System.out.println(fileOutput);
         } catch (IOException e) {
