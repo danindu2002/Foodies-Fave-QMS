@@ -1,22 +1,22 @@
 -------------------------------------->  Foodies Fave Queue Management System Data  <-------------------------------------- 
  
 
-Last Saved             ; Fri Jun 23 10:18:47 IST 2023 
+Last Saved             ; Sun Jul 16 00:25:40 IST 2023 
 
-Sold Burger Count      : 5
-Reserved Burger Count  : 25
-Remaining Burger Count : 25 
+Sold Burger Count      : 0
+Reserved Burger Count  : 0
+Remaining Burger Count : 50 
 
 ----------------------------------------------------- Cashier Queues ------------------------------------------------------ 
 
-Cashier 1              : namal  null   
-Cashier 2              : sunil  saman  null   
-Cashier 3              : sena  daan  null  null  null   
-No. of Empty Queues    : 5 
+Cashier 1              :  
+Cashier 2              :  
+Cashier 3              :  
+No. of Empty slots     : 10 
 
 --------------------------------------------------------------------------------------------------------------------------- 
 
-Served Customers Count : 1 
+Served Customers Count : 0 
  
  
 
